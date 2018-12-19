@@ -21,6 +21,7 @@ imgui.ini
 /data/state.json
 /data/tape.wav
 /data/log.txt
+/data/samples
 
 CMakeLists.txt.user
 .local.kak
