@@ -52,3 +52,12 @@ target_include_directories(range-v3 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 # Tiny Process library
 execute_process(COMMAND git submodule update --init -- tiny-process-library WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tiny-process-library)
+
+# OP-1 Drum Sample AIF Loader
+execute_process(COMMAND git submodule update --init -- op1-drum-sample-loader WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+file(GLOB_RECURSE op1aif_src "${CMAKE_CURRENT_SOURCE_DIR}/op1-drum-sample-loader/src/*.cpp")
+add_library(op1aif ${op1aif_src})
+target_include_directories(op1aif PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/op1-drum-sample-loader/include)
+target_include_directories(op1aif SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/op1-drum-sample-loader/include)
