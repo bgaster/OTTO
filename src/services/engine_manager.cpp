@@ -11,6 +11,7 @@
 #include "engines/synths/hammond/hammond.hpp"
 #include "engines/synths/nuke/nuke.hpp"
 #include "engines/synths/vocoder/vocoder.hpp"
+#include "engines/synths/sampler/sampler.hpp"
 
 #include "services/application.hpp"
 
@@ -136,6 +137,7 @@ namespace otto::services {
 
     sequencer.register_engine<engines::Euclid>("Euclid");
     synth.register_engine<engines::External>("External");
+    synth.register_engine<otto::engines::Sampler>("Sampler");
     synth.register_engine<engines::HammondSynth>("Woody");
     synth.register_engine<engines::NukeSynth>("Nuke");
     synth.register_engine<engines::OTTOFMSynth>("OTTO.FM");
