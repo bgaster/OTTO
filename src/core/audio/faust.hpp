@@ -31,6 +31,10 @@ namespace otto::core::audio {
   struct FaustOptions : UI {
     FaustOptions(FaustClient& client) : client(client) {}
 
+    void addSoundfile(const char* label, const char* filename, Soundfile** sf_zone) override {
+        
+    }
+
     void openTabBox(const char* label) override
     {
       if (atRoot) {

@@ -81,14 +81,40 @@ namespace otto::services {
       }
     }
 
-    for (unsigned i = 0; i < midi_in->getPortCount(); i++) {
-      auto port = midi_in->getPortName(i);
-      if (!util::starts_with(port, "OTTO:") &&
-          !util::starts_with(port, "Midi Through:Midi Through")) {
-        midi_in->openPort(i, "in");
-        DLOGI("Connected OTTO:in to midi port {}", port);
-      }
+    unsigned int i = 0;
+    unsigned int nPorts = midi_in->getPortCount();
+    std::string port;
+    if ( nPorts == 1 ) {
+        port = midi_in->getPortName(0);
+        if (!util::starts_with(port, "OTTO:") &&
+            !util::starts_with(port, "Midi Through:Midi Through")) {
+            midi_in->openPort(i, "in");
+            DLOGI("Connected OTTO:in to midi port {}", port);
+        }
     }
+    else {
+      for (unsigned int i = 0; i < nPorts; i++) {
+        port = midi_in->getPortName(i);
+        std::cout << "  Output port #" << i << ": " << port << '\n';
+      }
+
+      do {
+        std::cout << "\nChoose a port number: ";
+        std::cin >> i;
+      } while ( i >= nPorts );
+      std::cout << "\n";
+      midi_in->openPort(i);
+      DLOGI("Connected OTTO:in to midi port {}", midi_in->getPortName(i));
+    }
+
+    // for (unsigned i = 0; i < midi_in->getPortCount(); i++) {
+    //   auto port = midi_in->getPortName(i);
+    //   if (!util::starts_with(port, "OTTO:") &&
+    //       !util::starts_with(port, "Midi Through:Midi Through")) {
+    //     midi_in->openPort(i, "in");
+    //     DLOGI("Connected OTTO:in to midi port {}", port);
+    //   }
+    // }
 
     midi_in->setCallback(
       [](double timeStamp, std::vector<unsigned char>* message, void* userData) {
@@ -119,7 +145,8 @@ namespace otto::services {
     int ref_count = 0;
     auto in_buf = core::audio::AudioBufferHandle(in_data, nframes, ref_count);
     // steal the inner midi buffer
-    auto out = Application::current().engine_manager->process({in_buf, {std::move(midi_bufs.inner())}, nframes});
+    auto out = Application::current().engine_manager->process(
+        {in_buf, {std::move(midi_bufs.inner())}, nframes});
 
     // process_audio_output(out);
 
@@ -131,14 +158,14 @@ namespace otto::services {
       out_data[i * 2 + 1] = std::get<1>(out.audio[i]);
     }
 
-    if (midi_out) {
-      for (auto& ev : out.midi) {
-        util::match(ev, [this](auto& ev) {
-          auto bytes = ev.to_bytes();
-          midi_out->sendMessage(bytes.data(), bytes.size());
-        });
-      }
-    }
+    // if (midi_out) {
+    //   for (auto& ev : out.midi) {
+    //     util::match(ev, [this](auto& ev) {
+    //       auto bytes = ev.to_bytes();
+    //       midi_out->sendMessage(bytes.data(), bytes.size());
+    //     });
+    //   }
+    // }
 
     // return the midi buffer
     midi_bufs.inner() = out.midi.move_vector_out();
